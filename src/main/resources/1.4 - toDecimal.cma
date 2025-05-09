@@ -1,0 +1,18 @@
+loadc 12300
+
+loadc 0
+loop: loada 0
+loadc 10
+mod
+not
+jumpz end
+loadc 1
+add
+loada 0
+loadc 10
+div
+storea 0
+
+jump loop
+
+end: pop

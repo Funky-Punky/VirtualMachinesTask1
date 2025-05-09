@@ -1,0 +1,19 @@
+LOADC 10
+LOADC 15
+LOADC 22
+loada 1
+dup
+mul
+loadc 3
+mul
+loada 0
+loadc 2
+mul
+loadc 1
+add
+add
+loada 1
+loadc 42
+sub
+div
+storea 2

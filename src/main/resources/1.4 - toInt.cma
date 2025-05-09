@@ -1,0 +1,14 @@
+loadc 2
+loadc 3
+loop: dup
+jumpz end
+loadc 1
+sub
+loadc 10
+loada 0
+mul
+storea 0
+jump loop
+end:
+pop
+pop

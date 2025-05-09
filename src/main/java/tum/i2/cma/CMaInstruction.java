@@ -25,5 +25,14 @@ public class CMaInstruction {
         return args.length == CMaInstructionType.expectedNumberOfArguments(cMaInstructionType);
     }
 
+    @Override
+    public String toString() {
+        String out = cMaInstructionType.toString();
 
+        if (args.length == 1) {
+            out += " " + args[0];
+        }
+
+        return out;
+    }
 }

@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    application
 }
 
 group = "tum.i2"
@@ -16,4 +17,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass = "tum.i2.Main"
+    applicationDefaultJvmArgs = listOf("-Dgreeting.language=en")
 }
