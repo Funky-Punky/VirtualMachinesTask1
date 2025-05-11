@@ -2,17 +2,19 @@ package tum.i2.cma;
 
 import tum.i2.common.VirtualMachine;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class CMa implements VirtualMachine {
 
-    int stacksize = 999;
+    int stacksize = 1000;
+    boolean halted = false;
 
 
-    int sp = -1;
-    int[] memory = new int[stacksize];
+    int SP = -1;
+    int EP = -1;
+    int NP = stacksize;
+    int[] S = new int[stacksize];
 
     int pc = 0;
     CMaInstruction[] instructions;
@@ -23,6 +25,10 @@ public class CMa implements VirtualMachine {
 
     @Override
     public void step() {
+        if (halted) {
+            return;
+        }
+
         CMaInstruction instruction = instructions[pc];
         printDebug();
         pc++;
@@ -37,9 +43,8 @@ public class CMa implements VirtualMachine {
         // because it might make it easier to debug,
         // and would be required if you wish to implement
         // an interface with step function
-        boolean x = true;
 
-        while (true && x) {
+        while (!halted) {
             step();
         }
 
@@ -47,28 +52,32 @@ public class CMa implements VirtualMachine {
     }
 
     private void printDebug() {
-        System.out.print("[");
-        for (int i = 0; i < sp + 1; i++) {
-            System.out.print(memory[i] + " ");
+        System.out.print("Stack:\n[ ");
+        for (int i = 0; i < SP + 1; i++) {
+            System.out.print(S[i] + " ");
         }
         System.out.println("]");
 
-//        if (pc < instructions.length) {
+        System.out.print("Heap:\n[ ");
+        for (int i = NP; i < stacksize; i++) {
+            System.out.print(S[i] + " ");
+        }
+        System.out.println("]\n");
+
         System.out.println(instructions[pc]);
-//        }
         System.out.println();
     }
 
     public void executeBinaryIntegerOperator(BiFunction<Integer, Integer, Integer> operator) {
-        int i = operator.apply(memory[sp - 1], memory[sp]);
-        memory[sp - 1] = i;
-        sp--;
+        int i = operator.apply(S[SP - 1], S[SP]);
+        S[SP - 1] = i;
+        SP--;
     }
 
     public void executeLogicalOperator(BiFunction<Integer, Integer, Boolean> operator) {
-        int b = operator.apply(memory[sp - 1], memory[sp]) ? 1 : 0;
-        memory[sp - 1] = b;
-        sp--;
+        int b = operator.apply(S[SP - 1], S[SP]) ? 1 : 0;
+        S[SP - 1] = b;
+        SP--;
     }
 
     public void execute(CMaInstruction instruction) {
@@ -76,8 +85,8 @@ public class CMa implements VirtualMachine {
         // describing where the operations are defined
         switch (instruction.getType()) {
             case LOADC -> {
-                sp++;
-                memory[sp] = instruction.getFirstArg();
+                SP++;
+                S[SP] = instruction.getFirstArg();
             }
             case ADD -> {
                 executeBinaryIntegerOperator(Math::addExact);
@@ -122,51 +131,74 @@ public class CMa implements VirtualMachine {
                 executeLogicalOperator((a, b) -> a >= b);
             }
             case NOT -> {
-                int b = memory[sp] == 0 ? 1 : 0;
-                memory[sp] = b;
+                int b = S[SP] == 0 ? 1 : 0;
+                S[SP] = b;
             }
             case NEG -> {
-                memory[sp] = -memory[sp];
+                S[SP] = -S[SP];
             }
             case LOAD -> {
-                memory[sp] = memory[memory[sp]];
+                S[SP] = S[S[SP]];
             }
             case STORE -> {
-                memory[sp - 1] = memory[memory[sp]];
-                sp--;
+                S[S[SP]] = S[SP - 1];
+                SP--;
             }
             case LOADA -> {
-                sp++;
-                memory[sp] = memory[instruction.getFirstArg()];
+                SP++;
+                S[SP] = S[instruction.getFirstArg()];
             }
             case STOREA -> {
-                memory[instruction.getFirstArg()] = memory[sp];
-                sp--;
+                S[instruction.getFirstArg()] = S[SP];
+                SP--;
             }
             case POP -> {
-                sp--;
+                SP--;
             }
             case JUMP -> {
                 pc = instruction.getFirstArg();
             }
             case JUMPZ -> {
-                int i = memory[sp];
-                sp--;
+                int i = S[SP];
+                SP--;
 
                 if (i == 0) {
                     pc = instruction.getFirstArg();
                 }
             }
             case JUMPI -> {
-                pc = memory[sp + instruction.getFirstArg()];
-                sp--;
+                pc = S[SP + instruction.getFirstArg()];
+                SP--;
             }
             case DUP -> {
-                sp++;
-                memory[sp] = memory[sp - 1];
+                SP++;
+                S[SP] = S[SP - 1];
             }
             case ALLOC -> {
-                sp = sp + instruction.getFirstArg();
+                SP = SP + instruction.getFirstArg();
+            }
+            //WEEK 2
+            case HALT -> {
+                halted = true;
+            }
+            case NEW -> {
+                if (NP - S[SP] <= EP)
+                    S[SP] = 0;
+                else {
+                    NP = NP - S[SP];
+                    S[SP] = NP;
+                }
+            }
+            case RJUMP -> {
+                pc += instruction.getFirstArg() - 1;
+            }
+            case RJUMPZ -> {
+                int i = S[SP];
+                SP--;
+
+                if (i == 0) {
+                    pc += instruction.getFirstArg() - 1;
+                }
             }
             default -> throw new UnsupportedOperationException("Unknown instruction type: " + instruction.getType());
         }

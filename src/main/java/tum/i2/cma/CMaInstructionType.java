@@ -38,7 +38,18 @@ public enum CMaInstructionType {
     JUMPI,
     DUP,
     // Introduced in Storage Allocation for Variables
-    ALLOC;
+    ALLOC,
+
+    //Week2
+    HALT,
+    NEW,
+    RJUMP,
+    RJUMPZ
+
+
+
+    ;
+
     //
     private static final Map<String, CMaInstructionType> STRING_TO_ENUM = new HashMap<>();
 
@@ -59,14 +70,14 @@ public enum CMaInstructionType {
     static int expectedNumberOfArguments(CMaInstructionType type) {
         switch (type) {
             case LOADC:
-            case LOAD:
-            case STORE:
             case LOADA:
             case STOREA:
             case JUMP:
             case JUMPZ:
             case JUMPI:
             case ALLOC:
+            case RJUMP:
+            case RJUMPZ:
                 return 1;
             default:
                 return 0;
