@@ -12,3 +12,4 @@ jump loop
 end:
 pop
 pop
+halt

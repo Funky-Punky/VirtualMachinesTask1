@@ -16,3 +16,4 @@ storea 0
 jump loop
 
 end: pop
+halt

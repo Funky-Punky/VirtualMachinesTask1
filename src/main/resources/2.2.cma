@@ -1,0 +1,63 @@
+
+
+
+
+
+
+
+
+
+loada 1
+loadc 10
+gr
+jumpz 23
+loada 1
+loadc 1
+add
+loadc 1
+store
+pop
+loada 1
+loadc 2
+mod
+loadc 0
+eq
+jumpz 22
+loada 2
+loadc 1
+add
+loada 2
+store
+pop
+jump 0
+halt
+
+
+
+
+
+
+loada 1
+loadc 10
+gr
+jumpz 20
+loada 1
+loadc 1
+add
+loadc 1
+store
+pop
+loada 1
+loadc 2
+mod
+loadc 0
+eq
+jumpz 7
+loada 2
+loadc 1
+add
+loada 2
+store
+pop
+jump -22
+halt

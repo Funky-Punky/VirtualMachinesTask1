@@ -17,3 +17,4 @@ loadc 42
 sub
 div
 storea 2
+halt

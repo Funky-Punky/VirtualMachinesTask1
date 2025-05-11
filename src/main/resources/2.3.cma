@@ -1,0 +1,27 @@
+p_point = {x -> 0, y-> 1}
+p_foo   = {a -> 0, points -> 1, ptr -> 11, b -> 12}
+
+1:
+loadc 1  // = &bar
+loadc 11 // = p(ptr)
+add
+load
+
+loadc 1 // = p(y)
+add
+
+2:
+loadc 1 // = &bar
+loadc 1 // = p(points)
+add
+
+loadc 3  // = index
+loadc 2  // = sizeof(point)
+mul
+
+add
+
+loadc 0 // = p(x)
+add
+
+load

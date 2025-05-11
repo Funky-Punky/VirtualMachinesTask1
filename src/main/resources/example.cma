@@ -1,4 +1,6 @@
-LOADC 1
-LABEL: LOADC 2
-ADD
-JUMP LABEL
+loadc 1
+loadc 2
+loadc 3
+loadc 4
+loadc 5
+jump -6
