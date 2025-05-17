@@ -1,0 +1,87 @@
+
+
+|       | <- EP
+|       |
+|       |
+|   5   | <- SP
+|   8   | <- FP
+
+MARK
+
+|       | <- EP
+| FPold | <- SP
+| EPold |
+|   5   |
+|   8   | <- FP
+
+loadc _f
+
+|  _f   | <- EP, SP
+| FPold |
+| EPold |
+|   5   |
+|   8   | <- FP
+
+call
+
+|       |
+| PCold | <- EP, SP, FP
+| FPold |
+| EPold |
+|   5   |
+|   8   |
+
+enter 2
+
+|       |
+|       | <- EP
+|       |
+| PCold | <- SP, FP
+| FPold |
+| EPold |
+|   5   |
+|   8   |
+
+
+loadr -3
+loadr -4
+mul
+loadc 2
+add
+
+|       |
+|       | <- ep
+|   42  | <- sp
+| pcold | <- fp
+| fpold |
+| epold |
+|   5   |
+|   8   |
+
+Storer -3
+
+|       |
+|       | <- ep
+|   42  | <- sp
+| pcold | <- fp
+| fpold |
+| epold |
+|   42  |
+|   8   |
+
+return
+
+|       | <- EP
+|       |
+|       |
+|   42  | <- SP
+|   8   | <- FP
+
+slide -1
+
+|       | <- EP
+|       |
+|       |
+|       |
+|   42  | <- FP, SP
+

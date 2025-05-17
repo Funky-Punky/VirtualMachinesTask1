@@ -54,13 +54,14 @@ public class CMa implements VirtualMachine {
     }
 
     private void printDebug() {
+        System.out.println("Registers: SP=" + SP + ", EP=" + EP + ", FP=" + FP);
         System.out.print("Stack:\n[ ");
         for (int i = 0; i < SP + 1; i++) {
             System.out.print(S[i] + " ");
         }
         System.out.println("]");
 
-        System.out.print("Heap:\n[ ");
+        System.out.print("Heap:     NP=" + NP + "\n[ ");
         for (int i = NP; i < stacksize; i++) {
             System.out.print(S[i] + " ");
         }

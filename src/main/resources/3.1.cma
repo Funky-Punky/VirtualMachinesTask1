@@ -1,0 +1,17 @@
+loadc 8
+loadc 5
+mark
+loadc f
+call
+slide 1
+halt
+
+f:
+enter 2
+loadr -3
+loadr -4
+mul
+loadc 2
+add
+storer -3
+return

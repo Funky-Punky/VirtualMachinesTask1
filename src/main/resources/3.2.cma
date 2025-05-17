@@ -1,0 +1,43 @@
+enter 6
+alloc 3
+mark
+loadc main
+call
+slide 2
+halt
+
+
+// p_f = {r=1}
+f:
+enter 3
+alloc 1
+loadr -3
+loadr -4
+add
+storer 1
+
+loadr 1
+storer -3
+
+return
+
+// p_main = {x=1}
+main:
+enter 9
+
+alloc 1
+loadc 10
+storer 1
+
+loada 0
+loadr 1
+mark
+loadc f
+call
+slide 1
+
+storea 1
+
+loadr 1
+storer -3
+return

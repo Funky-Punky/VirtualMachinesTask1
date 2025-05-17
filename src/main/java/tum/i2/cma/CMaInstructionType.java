@@ -79,7 +79,7 @@ public enum CMaInstructionType {
 
     static int expectedNumberOfArguments(CMaInstructionType type) {
         return switch (type) {
-            case LOAD, STORE, POP, LOADC, LOADA, STOREA, JUMP, JUMPZ, JUMPI, ALLOC, RJUMP, RJUMPZ, SLIDE -> 1;
+            case LOAD, STORE, POP, LOADC, LOADA, STOREA, JUMP, JUMPZ, JUMPI, ALLOC, RJUMP, RJUMPZ, ENTER, SLIDE, LOADR, STORER -> 1;
             default -> 0;
         };
     }
