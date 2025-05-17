@@ -1,0 +1,26 @@
+1. 5 + (x*42);
+
+3
+[ 5 x 42 ]
+
+2. a[y*y + 5];
+// depends on size of array contents |t| - assume size is 1
+
+4
+[ a y y 5]
+
+3. x = y + 42;
+
+3
+[ x y 42 ]
+[ x (y42) &x ]
+
+4. while (x < 42) { x = x + 1; a[x+2] = 42; }
+
+5
+[ x 42 a x 2 ]
+
+5. if(x) x,x; else x+x;
+
+3
+[ x x x ]

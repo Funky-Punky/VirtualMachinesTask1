@@ -44,8 +44,18 @@ public enum CMaInstructionType {
     HALT,
     NEW,
     RJUMP,
-    RJUMPZ
+    RJUMPZ,
 
+
+    //Week 3
+    MARK,
+    CALL,
+    SLIDE,
+    ENTER,
+    RETURN,
+    LOADRC,
+    LOADR,
+    STORER,
 
 
     ;
@@ -68,19 +78,9 @@ public enum CMaInstructionType {
     }
 
     static int expectedNumberOfArguments(CMaInstructionType type) {
-        switch (type) {
-            case LOADC:
-            case LOADA:
-            case STOREA:
-            case JUMP:
-            case JUMPZ:
-            case JUMPI:
-            case ALLOC:
-            case RJUMP:
-            case RJUMPZ:
-                return 1;
-            default:
-                return 0;
-        }
+        return switch (type) {
+            case LOAD, STORE, POP, LOADC, LOADA, STOREA, JUMP, JUMPZ, JUMPI, ALLOC, RJUMP, RJUMPZ, SLIDE -> 1;
+            default -> 0;
+        };
     }
 }

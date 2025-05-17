@@ -13,10 +13,12 @@ public class CMa implements VirtualMachine {
 
     int SP = -1;
     int EP = -1;
+    int FP = -1;
+
     int NP = stacksize;
     int[] S = new int[stacksize];
 
-    int pc = 0;
+    int PC = 0;
     CMaInstruction[] instructions;
 
     public CMa(CMaInstruction[] instructions) {
@@ -29,9 +31,9 @@ public class CMa implements VirtualMachine {
             return;
         }
 
-        CMaInstruction instruction = instructions[pc];
+        CMaInstruction instruction = instructions[PC];
         printDebug();
-        pc++;
+        PC++;
         execute(instruction);
     }
 
@@ -48,7 +50,7 @@ public class CMa implements VirtualMachine {
             step();
         }
 
-        return 0;
+        return S[SP];
     }
 
     private void printDebug() {
@@ -64,7 +66,7 @@ public class CMa implements VirtualMachine {
         }
         System.out.println("]\n");
 
-        System.out.println(instructions[pc]);
+        System.out.println(instructions[PC]);
         System.out.println();
     }
 
@@ -88,60 +90,37 @@ public class CMa implements VirtualMachine {
                 SP++;
                 S[SP] = instruction.getFirstArg();
             }
-            case ADD -> {
-                executeBinaryIntegerOperator(Math::addExact);
-            }
-            case SUB -> {
-                executeBinaryIntegerOperator(Math::subtractExact);
-            }
-            case MUL -> {
-                executeBinaryIntegerOperator(Math::multiplyExact);
-            }
-            case DIV -> {
-                executeBinaryIntegerOperator(Math::divideExact);
-            }
-            case MOD -> {
-                executeBinaryIntegerOperator(Math::floorMod);
-            }
-            case AND -> {
-                executeLogicalOperator((a, b) -> a > 0 && b > 0);
-            }
-            case OR -> {
-                executeLogicalOperator((a, b) -> a > 0 || b > 0);
-            }
-            case XOR -> {
-                executeLogicalOperator((a, b) -> a > 0 ^ b > 0);
-            }
-            case EQ -> {
-                executeLogicalOperator(Integer::equals);
-            }
-            case NEQ -> {
-                executeLogicalOperator((a, b) -> !Objects.equals(a, b));
-            }
-            case LE -> {
-                executeLogicalOperator((a, b) -> a < b);
-            }
-            case LEQ -> {
-                executeLogicalOperator((a, b) -> a <= b);
-            }
-            case GR -> {
-                executeLogicalOperator((a, b) -> a > b);
-            }
-            case GEQ -> {
-                executeLogicalOperator((a, b) -> a >= b);
-            }
+            case ADD -> executeBinaryIntegerOperator(Math::addExact);
+            case SUB -> executeBinaryIntegerOperator(Math::subtractExact);
+            case MUL -> executeBinaryIntegerOperator(Math::multiplyExact);
+            case DIV -> executeBinaryIntegerOperator(Math::divideExact);
+            case MOD -> executeBinaryIntegerOperator(Math::floorMod);
+            case AND -> executeLogicalOperator((a, b) -> a > 0 && b > 0);
+            case OR -> executeLogicalOperator((a, b) -> a > 0 || b > 0);
+            case XOR -> executeLogicalOperator((a, b) -> a > 0 ^ b > 0);
+            case EQ -> executeLogicalOperator(Integer::equals);
+            case NEQ -> executeLogicalOperator((a, b) -> !Objects.equals(a, b));
+            case LE -> executeLogicalOperator((a, b) -> a < b);
+            case LEQ -> executeLogicalOperator((a, b) -> a <= b);
+            case GR -> executeLogicalOperator((a, b) -> a > b);
+            case GEQ -> executeLogicalOperator((a, b) -> a >= b);
             case NOT -> {
                 int b = S[SP] == 0 ? 1 : 0;
                 S[SP] = b;
             }
-            case NEG -> {
-                S[SP] = -S[SP];
-            }
+            case NEG -> S[SP] = -S[SP];
             case LOAD -> {
-                S[SP] = S[S[SP]];
+                int a = S[SP];
+                int k = instruction.getFirstArg();
+                for (int i = 0; i < k; i++)
+                    S[SP + i] = S[a + i];
+                SP = SP + k - 1;
             }
             case STORE -> {
-                S[S[SP]] = S[SP - 1];
+                int a = S[SP];
+                int k = instruction.getFirstArg();
+                for (int i = 0; i < k; i++)
+                    S[a + i] = S[SP - k + i];
                 SP--;
             }
             case LOADA -> {
@@ -152,35 +131,27 @@ public class CMa implements VirtualMachine {
                 S[instruction.getFirstArg()] = S[SP];
                 SP--;
             }
-            case POP -> {
-                SP--;
-            }
-            case JUMP -> {
-                pc = instruction.getFirstArg();
-            }
+            case POP -> SP = SP - instruction.getFirstArg();
+            case JUMP -> PC = instruction.getFirstArg();
             case JUMPZ -> {
                 int i = S[SP];
                 SP--;
 
                 if (i == 0) {
-                    pc = instruction.getFirstArg();
+                    PC = instruction.getFirstArg();
                 }
             }
             case JUMPI -> {
-                pc = S[SP + instruction.getFirstArg()];
+                PC = S[SP + instruction.getFirstArg()];
                 SP--;
             }
             case DUP -> {
                 SP++;
                 S[SP] = S[SP - 1];
             }
-            case ALLOC -> {
-                SP = SP + instruction.getFirstArg();
-            }
+            case ALLOC -> SP = SP + instruction.getFirstArg();
             //WEEK 2
-            case HALT -> {
-                halted = true;
-            }
+            case HALT -> halted = true;
             case NEW -> {
                 if (NP - S[SP] <= EP)
                     S[SP] = 0;
@@ -189,16 +160,57 @@ public class CMa implements VirtualMachine {
                     S[SP] = NP;
                 }
             }
-            case RJUMP -> {
-                pc += instruction.getFirstArg() - 1;
-            }
+            case RJUMP -> PC += instruction.getFirstArg() - 1;
             case RJUMPZ -> {
                 int i = S[SP];
                 SP--;
 
                 if (i == 0) {
-                    pc += instruction.getFirstArg() - 1;
+                    PC += instruction.getFirstArg() - 1;
                 }
+            }
+            case MARK -> {
+                S[SP + 1] = EP;
+                S[SP + 2] = FP;
+                SP = SP + 2;
+            }
+            case CALL -> {
+                int tmp = S[SP];
+                S[SP] = PC;
+                FP = SP;
+                PC = tmp;
+            }
+            case ENTER -> {
+                EP = SP + instruction.getFirstArg();
+                if (EP >= NP) {
+                    throw new RuntimeException("Stack Overflow");
+                }
+            }
+            case RETURN -> {
+                PC = S[FP];
+                EP = S[FP - 2];
+                if (EP >= NP) {
+                    throw new RuntimeException("Stack Overflow");
+                }
+                SP = FP - 3;
+                FP = S[SP + 2];
+            }
+            case SLIDE -> {
+                int tmp = S[SP];
+                SP = SP - instruction.getFirstArg();
+                S[SP] = tmp;
+            }
+            case LOADRC -> {
+                SP++;
+                S[SP] = FP + instruction.getFirstArg();
+            }
+            case LOADR -> {
+                SP++;
+                S[SP] = S[FP + instruction.getFirstArg()];
+            }
+            case STORER -> {
+                S[FP + instruction.getFirstArg()] = S[SP];
+                SP--;
             }
             default -> throw new UnsupportedOperationException("Unknown instruction type: " + instruction.getType());
         }
